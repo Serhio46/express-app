@@ -19,7 +19,6 @@ class UserController {
 	}
 
 	async createUser(req: Request, res: Response<ResponseType>): Promise<void> {
-		console.log('Creating user with data:', this);
 		const result = await this.service.createUser(req.body);
 
 		if (result) {
