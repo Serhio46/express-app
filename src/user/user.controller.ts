@@ -24,6 +24,7 @@ class UserController {
 
 		if (result) {
 			res.status(201).json(result);
+			return;
 		}
 
 		res.status(400).json({ message: 'Failed to create user' });
