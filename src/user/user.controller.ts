@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import UserService from './user.service';
-import { getUserId } from '../common/utils/request.utils';
+import { getParam } from '../common/helpers/request.helper/request.helper';
 import type { UserResponseDto } from './dto/user-response.dto';
 
 type ResponseType = UserResponseDto | UserResponseDto[] | { message: string };
@@ -42,7 +42,7 @@ class UserController {
 
 	async getUserById(req: Request, res: Response<ResponseType>): Promise<void> {
 		const { id } = req.params;
-		const userId = getUserId(id);
+		const userId = getParam(id);
 		const result = await this.service.getUserById(userId);
 
 		if (result) {
@@ -55,7 +55,7 @@ class UserController {
 
 	async updateUser(req: Request, res: Response<ResponseType>): Promise<void> {
 		const { id } = req.params;
-		const userId = getUserId(id);
+		const userId = getParam(id);
 
 		const result = await this.service.updateUser(userId, req.body);
 
@@ -69,7 +69,7 @@ class UserController {
 
 	async updatePassword(req: Request, res: Response<ResponseType>): Promise<void> {
 		const { id } = req.params;
-		const userId = getUserId(id);
+		const userId = getParam(id);
 
 		const result = await this.service.updatePassword(userId, req.body.password);
 
@@ -83,7 +83,7 @@ class UserController {
 
 	async deleteUser(req: Request, res: Response<ResponseType>): Promise<void> {
 		const { id } = req.params;
-		const userId = getUserId(id);
+		const userId = getParam(id);
 
 		const result = await this.service.deleteUser(userId);
 
