@@ -71,7 +71,7 @@ class UserController {
 		const { id } = req.params;
 		const userId = getUserId(id);
 
-		const result = await this.service.updatePassword(userId, req.body);
+		const result = await this.service.updatePassword(userId, req.body.password);
 
 		if (result) {
 			res.status(200).json(result);
