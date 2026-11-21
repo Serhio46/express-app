@@ -2,6 +2,14 @@ import { Router } from 'express';
 import BookController from './book.controller';
 import BookService from './book.service';
 import { loggerMiddleware } from '../middlewares/logger.middleware';
+import {
+	getBookByIdValidator,
+	createBookValidator,
+	getAllBooksValidator,
+	deleteBookValidator,
+	updateBookValidator,
+} from './book.validator';
+import { validateRequestMiddleware } from '../middlewares/validate-request.middleware';
 
 export function createBooksModule() {
 	const service = new BookService();
@@ -11,11 +19,11 @@ export function createBooksModule() {
 
 	router.use(loggerMiddleware);
 
-	router.post(`/`, createBook);
-	router.get(`/`, getAllBooks);
-	router.get(`/:id`, getBookById);
-	router.put(`/:id`, updateBook);
-	router.delete(`/:id`, deleteBook);
+	router.post(`/`, createBookValidator, validateRequestMiddleware, createBook);
+	router.get(`/`, getAllBooksValidator, validateRequestMiddleware, getAllBooks);
+	router.get(`/:id`, getBookByIdValidator, validateRequestMiddleware, getBookById);
+	router.put(`/:id`, updateBookValidator, validateRequestMiddleware, updateBook);
+	router.delete(`/:id`, deleteBookValidator, validateRequestMiddleware, deleteBook);
 
 	return { router, service };
 }

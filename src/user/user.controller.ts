@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import UserService from './user.service';
 import { getParam } from '../common/helpers/request.helper/request.helper';
 import type { UserResponseDto } from './dto/user-response.dto';
+import { matchedData } from 'express-validator';
+import type { UserCreateDto } from './dto/create-user.dto';
 
 type ResponseType = UserResponseDto | UserResponseDto[] | { message: string };
 
@@ -19,7 +21,8 @@ class UserController {
 	}
 
 	async createUser(req: Request, res: Response<ResponseType>): Promise<void> {
-		const result = await this.service.createUser(req.body);
+		const dto = matchedData<UserCreateDto>(req);
+		const result = await this.service.createUser(dto);
 
 		if (result) {
 			res.status(201).json(result);
@@ -30,6 +33,8 @@ class UserController {
 	}
 
 	async getAllUsers(req: Request, res: Response<ResponseType>): Promise<void> {
+		//TODO use wne pagination will be ready
+		const params = matchedData<{ limit: number; page: number }>(req);
 		const result = await this.service.getAllUsers();
 
 		if (!result?.length) {
@@ -56,8 +61,9 @@ class UserController {
 	async updateUser(req: Request, res: Response<ResponseType>): Promise<void> {
 		const { id } = req.params;
 		const userId = getParam(id);
+		const dto = matchedData<Partial<UserCreateDto>>(req);
 
-		const result = await this.service.updateUser(userId, req.body);
+		const result = await this.service.updateUser(userId, dto);
 
 		if (result) {
 			res.status(200).json(result);
@@ -70,8 +76,9 @@ class UserController {
 	async updatePassword(req: Request, res: Response<ResponseType>): Promise<void> {
 		const { id } = req.params;
 		const userId = getParam(id);
+		const { password } = matchedData<{ password: string }>(req);
 
-		const result = await this.service.updatePassword(userId, req.body.password);
+		const result = await this.service.updatePassword(userId, password);
 
 		if (result) {
 			res.status(200).json(result);

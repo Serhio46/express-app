@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import BookService from './book.service';
 import { getParam } from '../common/helpers/request.helper/request.helper';
 import type { BookResponseDto } from './dto/book-response.dto';
+import { matchedData } from 'express-validator';
+import type { BookCreateDto } from './dto/create-book.dto';
 
 type ResponseType = BookResponseDto | BookResponseDto[] | { message: string };
 
@@ -18,12 +20,14 @@ class BookController {
 	}
 
 	async createBook(req: Request, res: Response<ResponseType>): Promise<void> {
-		const result = await this.service.createBook(req.body);
+		const dto = matchedData<BookCreateDto>(req);
+		const result = await this.service.createBook(dto);
 
 		res.status(201).json(result);
 	}
 
 	async getAllBooks(req: Request, res: Response<ResponseType>): Promise<void> {
+		const params = matchedData<{ limit: number; page: number }>(req);
 		const result = await this.service.getAllBooks();
 
 		res.status(200).json(result);
@@ -43,7 +47,9 @@ class BookController {
 
 	async updateBook(req: Request, res: Response<ResponseType>): Promise<void> {
 		const id = getParam(req.params.id);
-		const result = await this.service.updateBook(id, req.body);
+		const dto = matchedData<BookCreateDto>(req);
+
+		const result = await this.service.updateBook(id, dto);
 
 		if (result) {
 			res.status(200).json(result);
