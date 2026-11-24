@@ -4,12 +4,14 @@ export class User {
 	readonly id: string;
 	password: string;
 	readonly createdAt: Date;
+	pepperVersion: number;
 
-	constructor(name: string, email: string, id: string, password: string, createdAt: Date) {
+	constructor(name: string, email: string, id: string, password: string, createdAt: Date, pepperVersion: number) {
 		this.name = name;
 		this.email = email;
 		this.id = id;
 		this.password = password;
 		this.createdAt = createdAt;
+		this.pepperVersion = pepperVersion;
 	}
 }

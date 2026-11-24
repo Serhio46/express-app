@@ -3,77 +3,51 @@ import type { UserResponseDto } from './dto/user-response.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import FileHelper from '../common/helpers/file.helper/file.helper';
-import { toUserResponse as toResponse } from '../common/helpers/mappers/user.mapper';
+import { toUserResponse as toResponse, toUserWithCredentialsResponse } from '../common/helpers/mappers/user.mapper';
 import { removeUser, replaceUser, type DbSchema } from './user.helpers';
-
-const DB_URL = new URL('../../db.json', import.meta.url);
+import type UsersRepository from './user.repository';
 
 class UserService {
-	async createUser({ name, email, password }: UserCreateDto): Promise<UserResponseDto> {
-		const db = await FileHelper.readFilePromise<DbSchema>(DB_URL);
+	repository: UsersRepository;
 
-		const user = new User(name, email, uuidv4(), password, new Date());
-		await FileHelper.writeFile<DbSchema>(DB_URL, { ...db, users: [...db.users, user] });
-
-		return toResponse(user);
+	constructor(repository: UsersRepository) {
+		this.repository = repository;
 	}
 
-	async getAllUsers(): Promise<UserResponseDto[]> {
-		const db = await FileHelper.readFilePromise<DbSchema>(DB_URL);
-		return db.users.map(toResponse);
-	}
-
-	async getUserById(id: string): Promise<UserResponseDto | null> {
-		const db = await FileHelper.readFilePromise<DbSchema>(DB_URL);
-		const user = db.users.find(u => u.id === id);
+	async createUser({ name, email, password, pepperVersion }: UserCreateDto): Promise<UserResponseDto | null> {
+		const candidate = new User(name, email, uuidv4(), password, new Date(), pepperVersion);
+		const user = await this.repository.create(candidate);
 		return user ? toResponse(user) : null;
 	}
 
-	async updateUser(id: string, updateData: Partial<UserCreateDto>): Promise<UserResponseDto | null> {
-		const db = await FileHelper.readFilePromise<DbSchema>(DB_URL);
-		const existing = db.users.find(u => u.id === id);
-
-		if (!existing) {
-			return null;
-		}
-
-		const updated: User = {
-			...existing,
-			name: updateData.name ?? existing.name,
-			email: updateData.email ?? existing.email,
-		};
-
-		await FileHelper.writeFile<DbSchema>(DB_URL, replaceUser(db, updated));
-
-		return toResponse(updated);
+	async getAllUsers(): Promise<UserResponseDto[]> {
+		const users = await this.repository.findAll();
+		return users.map(toResponse);
 	}
 
-	async updatePassword(id: string, password: string): Promise<UserResponseDto | null> {
-		const db = await FileHelper.readFilePromise<DbSchema>(DB_URL);
-		const existing = db.users.find(u => u.id === id);
+	async getUserById(id: string): Promise<UserResponseDto | null> {
+		const user = await this.repository.findById(id);
+		return user ? toResponse(user) : null;
+	}
 
-		if (!existing) {
-			return null;
-		}
+	async getUserWithCredentialsByEmail(email: string): Promise<UserResponseDto | null> {
+		const user = await this.repository.findByEmail(email);
+		return user ? toUserWithCredentialsResponse(user) : null;
+	}
 
-		const updated: User = { ...existing, password };
+	async updateUser(id: string, updateData: Partial<UserCreateDto>): Promise<UserResponseDto | null> {
+		const updatedUser = await this.repository.updateUser(id, updateData);
+		return updatedUser ? toResponse(updatedUser) : null;
+	}
 
-		await FileHelper.writeFile<DbSchema>(DB_URL, replaceUser(db, updated));
-
-		return toResponse(updated);
+	async updatePassword(id: string, password: string, pepperVersion: number): Promise<UserResponseDto | null> {
+		const updatedUser = await this.repository.updatePassword(id, password, pepperVersion);
+		return updatedUser ? toResponse(updatedUser) : null;
 	}
 
 	async deleteUser(id: string): Promise<UserResponseDto | null> {
-		const db = await FileHelper.readFilePromise<DbSchema>(DB_URL);
-		const user = db.users.find(u => u.id === id);
-
-		if (!user) {
-			return null;
-		}
-
-		await FileHelper.writeFile<DbSchema>(DB_URL, removeUser(db, id));
-
-		return toResponse(user);
+		const user = await this.repository.delete(id);
+		return user ? toResponse(user) : null;
 	}
 }
 

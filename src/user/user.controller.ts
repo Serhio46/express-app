@@ -4,8 +4,9 @@ import { getParam } from '../common/helpers/request.helper/request.helper';
 import type { UserResponseDto } from './dto/user-response.dto';
 import { matchedData } from 'express-validator';
 import type { UserCreateDto } from './dto/create-user.dto';
+import type { UserRegisterDto } from '../auth/dto/user-register.dto';
 
-type ResponseType = UserResponseDto | UserResponseDto[] | { message: string };
+type ResponseType = UserResponseDto | UserResponseDto[] | { message: string } | UserRegisterDto;
 
 class UserController {
 	service: UserService;

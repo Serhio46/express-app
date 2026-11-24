@@ -1,4 +1,4 @@
-import type { UserResponseDto } from '../../../user/dto/user-response.dto';
+import type { UserResponseDto, UserResponseWithCredentialsDto } from '../../../user/dto/user-response.dto';
 import type { User } from '../../../user/entities/user.entity';
 
 export const toUserResponse = (user: User): UserResponseDto => ({
@@ -6,4 +6,20 @@ export const toUserResponse = (user: User): UserResponseDto => ({
 	name: user.name,
 	email: user.email,
 	createdAt: user.createdAt,
+});
+
+export const toUserWithCredentialsResponse = ({
+	id,
+	name,
+	email,
+	createdAt,
+	pepperVersion,
+	password,
+}: User): UserResponseWithCredentialsDto => ({
+	id,
+	name,
+	email,
+	createdAt,
+	pepperVersion,
+	password,
 });
