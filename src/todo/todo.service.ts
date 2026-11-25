@@ -29,7 +29,6 @@ class TodoService {
 		return toResponse(todo);
 	}
 
-	/** Returns null when the todo does not exist or belongs to another user. */
 	async updateTitle(userId: string, id: string, title: string): Promise<TodoResponseDto | null> {
 		const todo = await this.repository.findByIdForUser(id, userId);
 		if (!todo) return null;

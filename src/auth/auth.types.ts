@@ -1,5 +1,13 @@
 import type { UserResponseDto, UserResponseWithCredentialsDto } from './dto/user-response.dto';
 
+export type AuthResult = UserResponseDto & { accessToken: string; refreshToken: string };
+
+export interface AuthUserRecord {
+	email: string;
+	password: string;
+	name: string;
+}
+
 export interface UsersPort {
 	getAllUsers(): Promise<UserResponseDto[]>;
 	getUserWithCredentialsByEmail(email: string): Promise<UserResponseWithCredentialsDto | null>;

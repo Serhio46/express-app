@@ -1,10 +1,8 @@
 import type { UserCreateDto } from './dto/create-user.dto';
-import type { UserResponseDto } from './dto/user-response.dto';
+import type { UserResponseDto, UserResponseWithCredentialsDto } from './dto/user-response.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
-import FileHelper from '../common/helpers/file.helper/file.helper';
 import { toUserResponse as toResponse, toUserWithCredentialsResponse } from '../common/helpers/mappers/user.mapper';
-import { removeUser, replaceUser, type DbSchema } from './user.helpers';
 import type UsersRepository from './user.repository';
 
 class UserService {
@@ -30,7 +28,7 @@ class UserService {
 		return user ? toResponse(user) : null;
 	}
 
-	async getUserWithCredentialsByEmail(email: string): Promise<UserResponseDto | null> {
+	async getUserWithCredentialsByEmail(email: string): Promise<UserResponseWithCredentialsDto | null> {
 		const user = await this.repository.findByEmail(email);
 		return user ? toUserWithCredentialsResponse(user) : null;
 	}

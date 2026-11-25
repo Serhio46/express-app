@@ -6,8 +6,8 @@ import TodoService from './todo.service';
 import TodoRepository from './todo.repository';
 import { loggerMiddleware } from '../middlewares/logger.middleware';
 import { validateRequestMiddleware } from '../middlewares/validate-request.middleware';
-import { createAuthenticateMiddleware } from '../auth/auth.middleware';
-import type TokenService from '../auth/services/token.service';
+import { createAuthMiddleware } from '../auth/auth.middleware';
+import type TokenService from '../auth/services/token/token.service';
 import { createTodoValidator, updateTodoTitleValidator, todoIdValidator } from './todo.validator';
 
 const DB_URL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../db.json');
@@ -20,7 +20,7 @@ export function createTodosModule(tokenService: TokenService) {
 	const { getAll, create, updateTitle, toggleCompleted, delete: deleteTodo } = controller;
 
 	router.use(loggerMiddleware);
-	router.use(createAuthenticateMiddleware(tokenService));
+	router.use(createAuthMiddleware(tokenService));
 
 	router.get(`/`, getAll);
 	router.post(`/`, createTodoValidator, validateRequestMiddleware, create);

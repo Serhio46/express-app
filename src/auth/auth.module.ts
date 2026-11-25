@@ -3,7 +3,7 @@ import AuthService from './auth.service';
 import AuthController from './auth.controller';
 import PasswordService from './services/password/password.service';
 import { readPeppers } from './services/password/password.helpers';
-import TokenService from './services/token.service';
+import TokenService from './services/token/token.service';
 import type { UsersPort } from './auth.types';
 
 import { loggerMiddleware } from '../middlewares/logger.middleware';
@@ -19,7 +19,7 @@ export function createAuthModule(userService: UsersPort) {
 		currentPepperVersion: Number(process.env.PEPPER),
 	});
 
-	const tokenService = new TokenService();
+	const tokenService = new TokenService(process.env.TOKEN_SECRET);
 	const authService = new AuthService(tokenService, userService, passwordService);
 	const authController = new AuthController(authService);
 
@@ -28,5 +28,5 @@ export function createAuthModule(userService: UsersPort) {
 	router.post('/register', registerUserValidator, validateRequestMiddleware, authController.registerUser);
 	router.post('/login', loginUserValidator, validateRequestMiddleware, authController.loginUser);
 
-	return { router };
+	return { router, tokenService };
 }
